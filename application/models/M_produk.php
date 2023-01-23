@@ -14,6 +14,17 @@ class M_produk extends CI_Model
 		$this->db->select('produk.*, admin.nama as nama_admin');
 		$this->db->from('produk');
 		$this->db->join('admin', 'admin.id = produk.admin_id');
+		$this->db->where('produk.is_supplier', 0);
+		$query = $this->db->get();
+		return $query->result_array();
+	}
+
+	public function getProdukBySupplier()
+	{
+		$this->db->select('produk.*, admin.nama as nama_admin');
+		$this->db->from('produk');
+		$this->db->join('admin', 'admin.id = produk.admin_id');
+		$this->db->where('produk.is_supplier', 1);
 		$query = $this->db->get();
 		return $query->result_array();
 	}

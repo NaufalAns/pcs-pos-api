@@ -237,6 +237,23 @@ class Api_pcs extends REST_Controller
 		$this->response($data_json, REST_Controller::HTTP_OK);
 	}
 
+	public function produk_supplier_get()
+	{
+		$this->cekToken();
+
+		$data['produk'] = $this->M_produk->getProdukBySupplier();
+
+		$data_json = array(
+			'success' => true,
+			'message' => 'Data found',
+			'data' => array(
+				'produk' => $data['produk']
+			)
+		);
+
+		$this->response($data_json, REST_Controller::HTTP_OK);
+	}
+
 	public function produk_post()
 	{
 		$this->cekToken();
@@ -430,6 +447,49 @@ class Api_pcs extends REST_Controller
 		$this->cekToken();
 
 		$result = $this->M_transaksi->getTransaksiBulanIni();
+
+		$data_json = array(
+			'success' => true,
+			'message' => 'Data found',
+			'data' => $result
+		);
+
+		$this->response($data_json, REST_Controller::HTTP_OK);
+	}
+
+	public function total_pendapatan_bulan_ini_get()
+	{
+		$this->cekToken();
+
+		$result = $this->M_transaksi->getTotalPendapatanBulanIni();
+
+		$data_json = array(
+			'success' => true,
+			'message' => 'Data found',
+			'data' => $result
+		);
+
+		$this->response($data_json, REST_Controller::HTTP_OK);
+	}
+	public function total_pembelian_bulan_ini_get()
+	{
+		$this->cekToken();
+
+		$result = $this->M_transaksi->getTotalPembelianBulanIni();
+
+		$data_json = array(
+			'success' => true,
+			'message' => 'Data found',
+			'data' => $result
+		);
+
+		$this->response($data_json, REST_Controller::HTTP_OK);
+	}
+	public function total_pendapatan_bulan_ini_bersih_get()
+	{
+		$this->cekToken();
+
+		$result = $this->M_transaksi->getTotalTransaksiBulanIniBersih();
 
 		$data_json = array(
 			'success' => true,
