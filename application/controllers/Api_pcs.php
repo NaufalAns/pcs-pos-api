@@ -261,14 +261,6 @@ class Api_pcs extends REST_Controller
 		// Validasi
 		$validation_message = array();
 
-		if ($this->post('admin_id') == '') {
-			$validation_message['admin_id'] = 'Admin Id tidak boleh kosong!';
-		}
-
-		if ($this->post('admin_id') != '' && !$this->M_admin->cekAdminExist($this->post('admin_id'))) {
-			$validation_message['admin_id'] = 'Admin Id tidak valid!';
-		}
-
 		if ($this->post('nama') == '') {
 			$validation_message['nama'] = 'Nama tidak boleh kosong!';
 		}
@@ -293,9 +285,6 @@ class Api_pcs extends REST_Controller
 			$validation_message['is_supplier'] = 'Is Supplier tidak boleh kosong!';
 		}
 
-		if ($this->post('supplier_id') == '') {
-			$validation_message['supplier_id'] = 'Supplier Id tidak boleh kosong!';
-		}
 
 		if (count($validation_message) > 0) {
 			$data_json = array(
