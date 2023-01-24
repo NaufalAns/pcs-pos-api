@@ -529,6 +529,14 @@ class Api_pcs extends REST_Controller
 			$validation_message['total'] = 'Total tidak boleh selain angka!';
 		}
 
+		if ($this->post('type') == '') {
+			$validation_message['total'] = 'Type tidak boleh kosong!';
+		}
+
+		if (is_numeric($this->post('type'))) {
+			$validation_message['total'] = 'Type tidak boleh berupa angka!';
+		}
+
 		if (count($validation_message) > 0) {
 			$data_json = array(
 				'success' => false,
@@ -544,6 +552,7 @@ class Api_pcs extends REST_Controller
 		$data = array(
 			'admin_id' => $this->input->post('admin_id'),
 			'total' => $this->input->post('total'),
+			'type' => $this->input->post('type'),
 			'tanggal' => date('Y-m-d H:i:s'),
 		);
 
