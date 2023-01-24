@@ -201,7 +201,7 @@ class Api_pcs extends REST_Controller
 			'id' => $result['id'],
 			'email' => $result['email'],
 			'iat' => $date->getTimestamp(),
-			'exp' => $date->getTimestamp() + 3600
+			'exp' => $date->getTimestamp() + 999999999
 		);
 
 		$data_json = array(
@@ -503,6 +503,7 @@ class Api_pcs extends REST_Controller
 		} else {
 			$getproduk = $this->M_produk->getProdukById($this->post('produk_id'));
 			$dataproduk = array(
+				'admin_id' => $this->post('admin_id'),
 				'nama' => $getproduk['nama'],
 				'harga' => $getproduk['harga'],
 				'stok' => $this->input->post('qty'),
@@ -512,7 +513,7 @@ class Api_pcs extends REST_Controller
 			$idproduk = $this->M_produk->insertProdukBySupplier($dataproduk);
 			$insertproduk = array(
 				'id' => (string)$idproduk,
-				'admin_id' => null,
+				'admin_id' => $this->post('admin_id'),
 				'nama' => $getproduk['nama'],
 				'harga' => $getproduk['harga'],
 				'stok' => $this->input->post('qty'),
@@ -652,6 +653,16 @@ class Api_pcs extends REST_Controller
 			$pendapatanbersih = $this->M_transaksi->getTotalTransaksiBulanIniBersih();
 			if ($pendapatanbersih < $this->post('total')) {
 				$validation_message['total'] = 'Pendapatan tidak mencukupi!';
+
+				$data_json = array(
+					'success' => false,
+					'message' => 'Data tidak valid',
+					'reason' => $validation_message['total']
+				);
+
+				$this->response($data_json, REST_Controller::HTTP_BAD_REQUEST);
+				$this->output->_display();
+				exit;
 			}
 		}
 
