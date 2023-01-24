@@ -34,6 +34,12 @@ class M_produk extends CI_Model
 		return $query->row_array();
 	}
 
+	public function getProdukBySupplierId($id)
+	{
+		$query = $this->db->get_where('produk', array('supplier_id' => $id));
+		return $query->row_array();
+	}
+
 	public function insertProduk($data)
 	{
 		$this->db->insert('produk', $data);
@@ -43,12 +49,28 @@ class M_produk extends CI_Model
 		return $this->getProdukById($insert_id);
 	}
 
+	public function insertProdukBySupplier($data)
+	{
+		$this->db->insert('produk', $data);
+
+		$insert_id = $this->db->insert_id();
+
+		return $insert_id;
+	}
+
 	public function updateProduk($id, $data)
 	{
 		$this->db->where('id', $id);
 		$this->db->update('produk', $data);
 
 		return $this->getProdukById($id);
+	}
+	public function updateProdukBySupplier($id, $data)
+	{
+		$this->db->where('supplier_id', $id);
+		$this->db->update('produk', $data);
+
+		return $this->getProdukBySupplierId($id);
 	}
 
 	public function deleteProduk($id)
@@ -64,6 +86,16 @@ class M_produk extends CI_Model
 	public function cekProdukExist($id)
 	{
 		$produk = $this->getProdukById($id);
+
+		if (empty($produk)) {
+			return false;
+		}
+
+		return true;
+	}
+	public function cekProdukBySupExist($id)
+	{
+		$produk = $this->getProdukBySupplierId($id);
 
 		if (empty($produk)) {
 			return false;
