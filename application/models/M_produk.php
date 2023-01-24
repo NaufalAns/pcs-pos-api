@@ -21,9 +21,8 @@ class M_produk extends CI_Model
 
 	public function getProdukBySupplier()
 	{
-		$this->db->select('produk.*, admin.nama as nama_admin');
+		$this->db->select('produk.*');
 		$this->db->from('produk');
-		$this->db->join('admin', 'admin.id = produk.admin_id');
 		$this->db->where('produk.is_supplier', 1);
 		$query = $this->db->get();
 		return $query->result_array();
