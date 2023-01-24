@@ -447,11 +447,17 @@ class Api_pcs extends REST_Controller
 		$this->cekToken();
 
 		$result = $this->M_transaksi->getTransaksiBulanIni();
+		$pendapatankotor = $this->M_transaksi->getTotalPendapatanBulanIni();
+		$pendapatanbersih = $this->M_transaksi->getTotalTransaksiBulanIniBersih();
 
 		$data_json = array(
 			'success' => true,
 			'message' => 'Data found',
-			'data' => $result
+			'data' => array(
+				'pendapatan_kotor' => (int)$pendapatankotor['total'],
+				'pendapatan_bersih' => $pendapatanbersih,
+				'transaksi' => $result
+			)
 		);
 
 		$this->response($data_json, REST_Controller::HTTP_OK);
