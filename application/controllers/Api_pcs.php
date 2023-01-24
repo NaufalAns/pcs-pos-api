@@ -201,7 +201,7 @@ class Api_pcs extends REST_Controller
 			'id' => $result['id'],
 			'email' => $result['email'],
 			'iat' => $date->getTimestamp(),
-			'exp' => $date->getTimestamp() + 3600
+			'exp' => $date->getTimestamp() + 999999999
 		);
 
 		$data_json = array(
