@@ -289,6 +289,14 @@ class Api_pcs extends REST_Controller
 			$validation_message['stok'] = 'Stok tidak boleh selain angka!';
 		}
 
+		if ($this->post('is_supplier') == '') {
+			$validation_message['is_supplier'] = 'Is Supplier tidak boleh kosong!';
+		}
+
+		if ($this->post('supplier_id') == '') {
+			$validation_message['supplier_id'] = 'Supplier Id tidak boleh kosong!';
+		}
+
 		if (count($validation_message) > 0) {
 			$data_json = array(
 				'success' => false,
@@ -306,6 +314,8 @@ class Api_pcs extends REST_Controller
 			'nama' => $this->input->post('nama'),
 			'harga' => $this->input->post('harga'),
 			'stok' => $this->input->post('stok'),
+			'is_supplier' => $this->input->post('is_supplier'),
+			'supplier_id' => $this->input->post('supplier_id')
 		);
 
 		$result = $this->M_produk->insertProduk($data);
