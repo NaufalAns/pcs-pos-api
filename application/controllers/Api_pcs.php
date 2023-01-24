@@ -422,8 +422,120 @@ class Api_pcs extends REST_Controller
 
 	// Produk End
 
-	// Transaksi Start
+	// Supplier Start
 
+	public function item_transaksi_by_supplier_post()
+	{
+		$this->cekToken();
+
+		// Validasi
+		$validation_message = array();
+
+		if ($this->post('transaksi_id') == '') {
+			$validation_message['transaksi_id'] = 'Transaksi Id tidak boleh kosong!';
+		}
+
+		if ($this->post('transaksi_id') != '' && !$this->M_transaksi->cekTransaksiExist($this->post('transaksi_id'))) {
+			$validation_message['transaksi_id'] = 'Transaksi Id tidak valid!';
+		}
+
+		if ($this->post('produk_id') == '') {
+			$validation_message['produk_id'] = 'Produk Id tidak boleh kosong!';
+		}
+
+		if ($this->post('produk_id') != '' && !$this->M_produk->cekProdukExist($this->post('produk_id'))) {
+			$validation_message['produk_id'] = 'Produk Id tidak valid!';
+		}
+
+		if ($this->post('qty') == '') {
+			$validation_message['qty'] = 'Qty tidak boleh kosong!';
+		}
+
+		if ($this->post('qty') != '' && !is_numeric($this->post('qty'))) {
+			$validation_message['qty'] = 'Qty tidak boleh selain angka!';
+		}
+
+		if ($this->post('harga_saat_transaksi') == '') {
+			$validation_message['harga_saat_transaksi'] = 'Harga tidak boleh kosong!';
+		}
+
+		if ($this->post('harga_saat_transaksi') != '' && !is_numeric($this->post('harga_saat_transaksi'))) {
+			$validation_message['harga_saat_transaksi'] = 'Harga tidak boleh selain angka!';
+		}
+
+		if ($this->input->post('qty') != '' && $this->post('produk_id')) {
+			$produk = $this->M_produk->getProdukById($this->post('produk_id'));
+			if ($produk['stok'] < $this->post('qty')) {
+				$validation_message['qty'] = 'Stok tidak mencukupi!';
+			}
+		}
+
+		if (count($validation_message) > 0) {
+			$data_json = array(
+				'success' => false,
+				'message' => 'Data tidak valid',
+				'data' => $validation_message
+			);
+
+			$this->response($data_json, REST_Controller::HTTP_BAD_REQUEST);
+			$this->output->_display();
+			exit;
+		}
+
+		$data = array(
+			'transaksi_id' => $this->input->post('transaksi_id'),
+			'produk_id' => $this->input->post('produk_id'),
+			'qty' => $this->input->post('qty'),
+			'harga_saat_transaksi' => $this->input->post('harga_saat_transaksi'),
+			'sub_total' => $this->input->post('qty') * $this->input->post('harga_saat_transaksi'),
+		);
+
+		$result = $this->M_item_transaksi->insertItemTransaksi($data);
+
+		$cekproduk = $this->M_produk->cekProdukBySupExist($this->post('produk_id'));
+
+		if ($cekproduk == true) {
+			$getproduk = $this->M_produk->getProdukBySupplierId($this->post('produk_id'));
+			$dataproduk = array(
+				'stok' => $getproduk['stok'] + $this->input->post('qty'),
+			);
+			$insertproduk = $this->M_produk->updateProdukBySupplier($this->post('produk_id'), $dataproduk);
+		} else {
+			$getproduk = $this->M_produk->getProdukById($this->post('produk_id'));
+			$dataproduk = array(
+				'nama' => $getproduk['nama'],
+				'harga' => $getproduk['harga'],
+				'stok' => $this->input->post('qty'),
+				'is_supplier' => 0,
+				'supplier_id' => $this->post('produk_id'),
+			);
+			$idproduk = $this->M_produk->insertProdukBySupplier($dataproduk);
+			$insertproduk = array(
+				'id' => (string)$idproduk,
+				'admin_id' => null,
+				'nama' => $getproduk['nama'],
+				'harga' => $getproduk['harga'],
+				'stok' => $this->input->post('qty'),
+				'is_supplier' => (string)0,
+				'supplier_id' => $this->post('produk_id'),
+			);
+		}
+
+		$data_json = array(
+			'success' => true,
+			'message' => 'Pembelian Berhasil',
+			'data' => array(
+				'insert_produk' => $insertproduk,
+				'insert_item_transaksi' => $result
+			)
+		);
+
+		$this->response($data_json, REST_Controller::HTTP_OK);
+	}
+
+	// Supplier End
+
+	// Transaksi Start
 	public function transaksi_get()
 	{
 		$this->cekToken();
@@ -534,6 +646,13 @@ class Api_pcs extends REST_Controller
 
 		if (is_numeric($this->post('type'))) {
 			$validation_message['total'] = 'Type tidak boleh berupa angka!';
+		}
+
+		if ($this->post('type') == 'pembelian' && $this->post('total') != '') {
+			$pendapatanbersih = $this->M_transaksi->getTotalTransaksiBulanIniBersih();
+			if ($pendapatanbersih < $this->post('total')) {
+				$validation_message['total'] = 'Pendapatan tidak mencukupi!';
+			}
 		}
 
 		if (count($validation_message) > 0) {
